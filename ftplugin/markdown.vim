@@ -720,6 +720,19 @@ if !exists('*s:EditUrlUnderCursor')
     endfunction
 endif
 
+if !exists("*s:TabEditUrlUnderCursor")
+  function s:TabEditUrlUnderCursor()
+      let l:url = s:Markdown_GetUrlForPosition(line('.'), col('.'))
+      if l:url != ''
+          execute 'tab drop' l:url
+      else
+          echomsg 'The cursor is not on a link.'
+      endif
+  endfunction
+endif
+
+
+
 function! s:VersionAwareNetrwBrowseX(url)
     if has('patch-7.4.567')
         call netrw#BrowseX(a:url, 0)
@@ -743,6 +756,7 @@ call <sid>MapNormVis('<Plug>Markdown_MoveToParentHeader', '<sid>MoveToParentHead
 call <sid>MapNormVis('<Plug>Markdown_MoveToCurHeader', '<sid>MoveToCurHeader')
 nnoremap <Plug>Markdown_OpenUrlUnderCursor :call <sid>OpenUrlUnderCursor()<cr>
 nnoremap <Plug>Markdown_EditUrlUnderCursor :call <sid>EditUrlUnderCursor()<cr>
+nnoremap <Plug>Markdown_TabEditUrlUnderCursor :call <sid>TabEditUrlUnderCursor()<cr>
 
 if !get(g:, 'vim_markdown_no_default_key_mappings', 0)
     call <sid>MapNotHasmapto(']]', 'Markdown_MoveToNextHeader')
@@ -752,7 +766,8 @@ if !get(g:, 'vim_markdown_no_default_key_mappings', 0)
     call <sid>MapNotHasmapto(']u', 'Markdown_MoveToParentHeader')
     call <sid>MapNotHasmapto(']c', 'Markdown_MoveToCurHeader')
     call <sid>MapNotHasmapto('gx', 'Markdown_OpenUrlUnderCursor')
-    call <sid>MapNotHasmapto('ge', 'Markdown_EditUrlUnderCursor')
+    call <sid>MapNotHasmapto('gE', 'Markdown_EditUrlUnderCursor')
+    call <sid>MapNotHasmapto('ge', 'Markdown_TabEditUrlUnderCursor')
 endif
 
 command! -buffer -range=% HeaderDecrease call s:HeaderDecrease(<line1>, <line2>)
@@ -875,3 +890,4 @@ augroup Mkd
     autocmd InsertEnter,InsertLeave <buffer> call s:MarkdownRefreshSyntax(0)
     autocmd CursorHold,CursorHoldI <buffer> call s:MarkdownRefreshSyntax(0)
 augroup END
+
